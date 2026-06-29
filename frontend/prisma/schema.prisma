@@ -4,10 +4,259 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(STUDENT)
+  password  String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile    StudentProfile?
+  instructorProfile InstructorProfile?
+  notifications     Notification[]
+}
+
+model StudentProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrollments  Enrollment[]
+  progress     Progress[]
+  testResults  TestResult[]
+  certificates Certificate[]
+
+  @@index([userId])
+}
+
+model InstructorProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bio       String?
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courses Course[]
+
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  courses Course[]
+}
+
+model Course {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  price       Float?
+  isPublished Boolean     @default(false)
+  level       CourseLevel @default(BEGINNER)
+
+  instructorId String
+  categoryId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  instructor   InstructorProfile @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  category     Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  chapters     Chapter[]
+  enrollments  Enrollment[]
+  certificates Certificate[]
+
+  @@index([instructorId])
+  @@index([categoryId])
+}
+
+model Chapter {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  position    Int
+  isPublished Boolean @default(false)
+  courseId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+  quizzes Quiz[]
+
+  @@index([courseId])
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  videoUrl    String?
+  position    Int
+  isPublished Boolean @default(false)
+  isFree      Boolean @default(false)
+  chapterId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapter  Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  progress Progress[]
+
+  @@index([chapterId])
+}
+
+model Enrollment {
+  id               String           @id @default(cuid())
+  studentProfileId String
+  courseId         String
+  status           EnrollmentStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentProfileId, courseId])
+  @@index([studentProfileId])
+  @@index([courseId])
+}
+
+model Progress {
+  id               String  @id @default(cuid())
+  studentProfileId String
+  lessonId         String
+  isCompleted      Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  lesson         Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([studentProfileId, lessonId])
+  @@index([studentProfileId])
+  @@index([lessonId])
+}
+
+model Quiz {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  chapterId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapter     Chapter      @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  testResults TestResult[]
+
+  @@index([chapterId])
+}
+
+model Question {
+  id          String  @id @default(cuid())
+  text        String
+  options     Json
+  answer      String
+  explanation String?
+  quizId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+}
+
+model TestResult {
+  id               String  @id @default(cuid())
+  score            Float
+  passed           Boolean
+  studentProfileId String
+  quizId           String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  quiz           Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([studentProfileId])
+  @@index([quizId])
+}
+
+model Certificate {
+  id               String  @id @default(cuid())
+  certificateUrl   String?
+  studentProfileId String
+  courseId         String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentProfileId, courseId])
+  @@index([studentProfileId])
+  @@index([courseId])
+}
+
+model Notification {
+  id      String  @id @default(cuid())
+  userId  String
+  title   String
+  message String
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
