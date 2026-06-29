@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ThemeToggle"; // We'll create this or just leave as placeholder
 import { Button } from "@/components/ui/button";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export function Navbar() {
   return (
@@ -32,13 +32,17 @@ export function Navbar() {
             {/* Search Placeholder */}
           </div>
           <nav className="flex items-center space-x-2">
-            <Button variant="ghost" asChild>
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/signup">Sign up</Link>
-            </Button>
-            {/* Theme Toggle placeholder */}
+            <SignedOut>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Sign up</Link>
+              </Button>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </nav>
         </div>
       </div>
