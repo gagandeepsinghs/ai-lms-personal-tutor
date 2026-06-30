@@ -1,12 +1,33 @@
+import { Navbar } from "@/components/landing/Navbar";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { TrustedBySection } from "@/components/landing/TrustedBySection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { LearningCategoriesSection } from "@/components/landing/LearningCategoriesSection";
+import { PopularCoursesSection } from "@/components/landing/PopularCoursesSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { FAQSection } from "@/components/landing/FAQSection";
+import { CTASection } from "@/components/landing/CTASection";
+import { Footer } from "@/components/landing/Footer";
+
 export default function Home() {
   return (
-    <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center text-center">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-        Welcome to AI LMS Personal Tutor
-      </h1>
-      <p className="text-lg text-muted-foreground max-w-[700px] mb-8">
-        Your next-generation learning management system powered by artificial intelligence. Experience personalized education like never before.
-      </p>
+    <div className="min-h-screen flex flex-col font-sans">
+      <Navbar />
+      <main className="flex-1">
+        <HeroSection />
+        <TrustedBySection />
+        <FeaturesSection />
+        <LearningCategoriesSection />
+        <PopularCoursesSection />
+        <HowItWorksSection />
+        <TestimonialsSection />
+        <PricingSection />
+        <FAQSection />
+        <CTASection />
+      </main>
+      <Footer />
     </div>
   );
 }
