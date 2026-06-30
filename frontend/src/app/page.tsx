@@ -4,6 +4,7 @@ import { TrustedBySection } from "@/components/landing/TrustedBySection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { LearningCategoriesSection } from "@/components/landing/LearningCategoriesSection";
 import { PopularCoursesSection } from "@/components/landing/PopularCoursesSection";
+import { StatsSection } from "@/components/landing/StatsSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { PricingSection } from "@/components/landing/PricingSection";
@@ -21,6 +22,7 @@ export default function Home() {
         <FeaturesSection />
         <LearningCategoriesSection />
         <PopularCoursesSection />
+        <StatsSection />
         <HowItWorksSection />
         <TestimonialsSection />
         <PricingSection />

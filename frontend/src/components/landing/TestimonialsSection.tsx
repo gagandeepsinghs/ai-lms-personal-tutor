@@ -1,4 +1,7 @@
-import { Quote } from "lucide-react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Quote, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function TestimonialsSection() {
   const testimonials = [
@@ -19,8 +22,31 @@ export function TestimonialsSection() {
       author: "Michael Rodriguez",
       role: "Product Manager",
       avatar: "https://i.pravatar.cc/150?u=michael"
+    },
+    {
+      quote: "The personalized learning paths helped me transition from a totally different career into tech. The AI is incredibly patient and clear.",
+      author: "Emily Taylor",
+      role: "UX Designer",
+      avatar: "https://i.pravatar.cc/150?u=emily"
     }
   ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+  };
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [currentIndex]);
 
   return (
     <section className="py-24 bg-card/50">
@@ -34,29 +60,65 @@ export function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="p-8 rounded-2xl bg-background border border-border/50 shadow-sm relative">
-              <Quote className="absolute top-6 right-6 w-10 h-10 text-primary/10" />
-              
-              <div className="flex items-center gap-4 mb-6">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={testimonial.avatar} 
-                  alt={testimonial.author} 
-                  className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
-                />
-                <div>
-                  <h4 className="font-bold text-foreground">{testimonial.author}</h4>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+        <div className="relative max-w-4xl mx-auto">
+          <div className="overflow-hidden relative">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="w-full shrink-0 px-4">
+                  <div className="p-10 rounded-3xl bg-background border border-border/50 shadow-lg relative max-w-2xl mx-auto">
+                    <Quote className="absolute top-6 right-6 w-12 h-12 text-primary/10" />
+                    
+                    <p className="text-lg md:text-xl text-foreground leading-relaxed italic mb-8 relative z-10">
+                      "{testimonial.quote}"
+                    </p>
+
+                    <div className="flex items-center gap-4">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={testimonial.avatar} 
+                        alt={testimonial.author} 
+                        className="w-14 h-14 rounded-full object-cover border-2 border-primary"
+                      />
+                      <div>
+                        <h4 className="font-bold text-foreground text-lg">{testimonial.author}</h4>
+                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <p className="text-muted-foreground leading-relaxed italic">
-                "{testimonial.quote}"
-              </p>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <button 
+              onClick={prevSlide}
+              className="p-3 rounded-full bg-background border border-border/50 hover:bg-muted text-foreground transition-colors shadow-sm"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="flex gap-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-colors ${currentIndex === index ? 'bg-primary' : 'bg-primary/20'}`}
+                  aria-label={`Go to testimonial ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button 
+              onClick={nextSlide}
+              className="p-3 rounded-full bg-background border border-border/50 hover:bg-muted text-foreground transition-colors shadow-sm"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </section>
